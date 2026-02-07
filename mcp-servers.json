@@ -8,25 +8,16 @@
     "github": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-github"],
-      "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
-      },
       "transportType": "stdio"
     },
     "brave": {
       "command": "npx",
-      "args": ["-y", "@anthropic/mcp-brave-search"],
-      "env": {
-        "BRAVE_API_KEY": "${BRAVE_API_KEY}"
-      },
+      "args": ["-y", "@brave/brave-search-mcp-server"],
       "transportType": "stdio"
     },
     "todoist": {
       "command": "npx",
       "args": ["-y", "todoist-mcp-server"],
-      "env": {
-        "TODOIST_API_TOKEN": "${TODOIST_API_TOKEN}"
-      },
       "transportType": "stdio"
     },
     "git": {
@@ -37,19 +28,16 @@
     "firecrawl": {
       "command": "npx",
       "args": ["-y", "firecrawl-mcp"],
-      "env": {
-        "FIRECRAWL_API_KEY": "${FIRECRAWL_API_KEY}"
-      },
       "transportType": "stdio"
     },
     "puppeteer": {
       "command": "npx",
-      "args": ["-y", "@anthropic/mcp-puppeteer"],
+      "args": ["-y", "@modelcontextprotocol/server-puppeteer"],
       "transportType": "stdio"
     },
     "thinking": {
       "command": "npx",
-      "args": ["-y", "@anthropic/mcp-sequential-thinking"],
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
       "transportType": "stdio"
     }
   }

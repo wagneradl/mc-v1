@@ -1,7 +1,7 @@
 # Multi-stage: build memory-mcp binary, then extend mcp-proxy with it + runtimes
 
 # Stage 1: Build memory-mcp Go binary
-FROM golang:1.22-alpine AS memory-builder
+FROM golang:1.25-alpine AS memory-builder
 WORKDIR /build
 COPY memory-mcp/go.mod memory-mcp/go.sum ./
 RUN go mod download
@@ -24,12 +24,15 @@ RUN chmod +x /usr/local/bin/memory-mcp
 # Copy server config
 COPY mcp-servers.json /etc/mcp-proxy/servers.json
 
-# Create data directory for memory-mcp
+# Create data directory for memory-mcp and npm/uv cache dirs for non-root user
 RUN mkdir -p /data/memory/projects /data/memory/archive && \
-    chown -R 1000:1000 /data/memory
+    chown -R 1000:1000 /data/memory && \
+    mkdir -p /.npm /.cache/uv && \
+    chown -R 1000:1000 /.npm /.cache
 
 USER 1000
 
-ENTRYPOINT ["catatonit", "--", "mcp-proxy", "--port", "8080", \
+ENTRYPOINT ["catatonit", "--", "mcp-proxy", \
+    "--host", "0.0.0.0", "--port", "8080", \
     "--named-server-config", "/etc/mcp-proxy/servers.json", \
     "--pass-environment"]

@@ -117,19 +117,19 @@ Three phases, each with clear deliverables and acceptance criteria. Phase 1 is t
 - [x] Write `docker-compose.yml` with Caddy, mcp-proxy, and Memory MCP
 - [x] Configure named servers in mcp-proxy for all 8 MCPs
 - [x] Set up volume mounts for memory data and Caddy certs
-- [ ] Test locally: `docker compose up -d`
-- [ ] Verify all services start without errors
+- [x] Test locally: `docker compose up -d`
+- [x] Verify all services start without errors
 
 ### Task 2.2 — Caddy Configuration
 - [x] Write Caddyfile with Bearer token auth and reverse proxy
 - [x] Configure SSE-friendly settings (flush_interval, timeouts)
-- [ ] Test TLS auto-provisioning
-- [ ] Test auth: 401 without token, 200 with token
+- [x] Test TLS auto-provisioning
+- [x] Test auth: 401 without token, 200 with token
 
 ### Task 2.3 — Integration Testing
 - [ ] Test each MCP server through the proxy
-- [ ] Test Memory MCP tools through the full stack (Caddy → proxy → Memory)
-- [ ] Test SSE endpoint for streaming
+- [x] Test Memory MCP tools through the full stack (Caddy → proxy → Memory)
+- [x] Test SSE endpoint for streaming
 - [ ] Test with MCP Inspector through HTTPS
 
 ### Task 2.4 — Environment & Secrets
