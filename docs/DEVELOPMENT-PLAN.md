@@ -89,7 +89,7 @@ Three phases, each with clear deliverables and acceptance criteria. Phase 1 is t
 **Acceptance:** Server starts in stdio mode, responds to `initialize`, lists all tools via `tools/list`.
 
 ### Task 1.8 — Integration Testing
-- [ ] Test full workflow via stdio:
+- [x] Test full workflow via stdio:
   1. `create_project("test-project")`
   2. `switch_project("test-project")` (auto if just created)
   3. `create_entities([{name: "Go", type: "technology", observations: ["Fast compiled language"]}])`
@@ -102,7 +102,7 @@ Three phases, each with clear deliverables and acceptance criteria. Phase 1 is t
   10. `archive_project("test-project")`
   11. `restore_project("test-project")`
   12. `delete_project("test-project")`
-- [ ] Test error cases: no active project, duplicate names, missing entities
+- [x] Test error cases: no active project, duplicate names, missing entities
 - [ ] Test with MCP Inspector: `npx @modelcontextprotocol/inspector`
 
 **Acceptance:** Full workflow passes. Error messages are clear and actionable.
@@ -114,15 +114,15 @@ Three phases, each with clear deliverables and acceptance criteria. Phase 1 is t
 **Goal:** All MCPs running behind mcp-proxy in Docker Compose, accessible via HTTPS with auth.
 
 ### Task 2.1 — Docker Compose
-- [ ] Write `docker-compose.yml` with Caddy, mcp-proxy, and Memory MCP
-- [ ] Configure named servers in mcp-proxy for all 8 MCPs
-- [ ] Set up volume mounts for memory data and Caddy certs
+- [x] Write `docker-compose.yml` with Caddy, mcp-proxy, and Memory MCP
+- [x] Configure named servers in mcp-proxy for all 8 MCPs
+- [x] Set up volume mounts for memory data and Caddy certs
 - [ ] Test locally: `docker compose up -d`
 - [ ] Verify all services start without errors
 
 ### Task 2.2 — Caddy Configuration
-- [ ] Write Caddyfile with Bearer token auth and reverse proxy
-- [ ] Configure SSE-friendly settings (flush_interval, timeouts)
+- [x] Write Caddyfile with Bearer token auth and reverse proxy
+- [x] Configure SSE-friendly settings (flush_interval, timeouts)
 - [ ] Test TLS auto-provisioning
 - [ ] Test auth: 401 without token, 200 with token
 
@@ -133,9 +133,9 @@ Three phases, each with clear deliverables and acceptance criteria. Phase 1 is t
 - [ ] Test with MCP Inspector through HTTPS
 
 ### Task 2.4 — Environment & Secrets
-- [ ] Create `.env.example` with all required variables (no real values)
-- [ ] Document which API keys are needed and where to get them
-- [ ] Add `.env` to `.gitignore`
+- [x] Create `.env.example` with all required variables (no real values)
+- [x] Document which API keys are needed and where to get them
+- [x] Add `.env` to `.gitignore`
 
 ---
 

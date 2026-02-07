@@ -1,0 +1,35 @@
+# Multi-stage: build memory-mcp binary, then extend mcp-proxy with it + runtimes
+
+# Stage 1: Build memory-mcp Go binary
+FROM golang:1.22-alpine AS memory-builder
+WORKDIR /build
+COPY memory-mcp/go.mod memory-mcp/go.sum ./
+RUN go mod download
+COPY memory-mcp/ .
+RUN CGO_ENABLED=0 go build -o memory-mcp .
+
+# Stage 2: Extend mcp-proxy (Python 3.13 Alpine) with Node.js, uv, and memory-mcp
+FROM ghcr.io/sparfenyuk/mcp-proxy:latest
+
+USER root
+
+# Install Node.js + npm (for npx-based MCP servers) and uv (for uvx-based servers)
+RUN apk add --no-cache nodejs npm && \
+    pip install --no-cache-dir uv
+
+# Copy memory-mcp binary from builder
+COPY --from=memory-builder /build/memory-mcp /usr/local/bin/memory-mcp
+RUN chmod +x /usr/local/bin/memory-mcp
+
+# Copy server config
+COPY mcp-servers.json /etc/mcp-proxy/servers.json
+
+# Create data directory for memory-mcp
+RUN mkdir -p /data/memory/projects /data/memory/archive && \
+    chown -R 1000:1000 /data/memory
+
+USER 1000
+
+ENTRYPOINT ["catatonit", "--", "mcp-proxy", "--port", "8080", \
+    "--named-server-config", "/etc/mcp-proxy/servers.json", \
+    "--pass-environment"]

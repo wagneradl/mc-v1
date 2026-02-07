@@ -1,0 +1,51 @@
+services:
+  # ── Caddy (TLS + Auth) ─────────────────────────────
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN}
+      MCP_BEARER_TOKEN: ${MCP_BEARER_TOKEN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - mcp-proxy
+    networks:
+      - mcp-net
+
+  # ── MCP Proxy (Aggregator + all MCP servers) ───────
+  mcp-proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp-proxy
+    restart: unless-stopped
+    expose:
+      - "8080"
+    environment:
+      GITHUB_TOKEN: ${GITHUB_TOKEN}
+      GITHUB_PERSONAL_ACCESS_TOKEN: ${GITHUB_TOKEN}
+      FIRECRAWL_API_KEY: ${FIRECRAWL_API_KEY}
+      BRAVE_API_KEY: ${BRAVE_API_KEY}
+      TODOIST_API_TOKEN: ${TODOIST_API_TOKEN}
+    volumes:
+      - memory_data:/data/memory
+    networks:
+      - mcp-net
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+
+volumes:
+  caddy_data:
+  caddy_config:
+  memory_data:
+
+networks:
+  mcp-net:
+    driver: bridge

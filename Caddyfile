@@ -1,0 +1,29 @@
+{$DOMAIN} {
+    # Bearer token authentication
+    @authorized {
+        header Authorization "Bearer {$MCP_BEARER_TOKEN}"
+    }
+
+    # Authorized requests → proxy to MCP
+    handle @authorized {
+        reverse_proxy mcp-proxy:8080 {
+            # SSE-friendly settings
+            flush_interval -1
+            transport http {
+                read_timeout 0
+                write_timeout 0
+            }
+        }
+    }
+
+    # Unauthorized → 401
+    handle {
+        respond "Unauthorized" 401
+    }
+
+    # Logging
+    log {
+        output file /var/log/caddy/access.log
+        format json
+    }
+}
