@@ -1,0 +1,13 @@
+# Runtime data
+data/_meta.db
+data/_meta.db-wal
+data/_meta.db-shm
+data/projects/*.db
+data/projects/*.db-wal
+data/projects/*.db-shm
+data/archive/*.db
+data/archive/*.db-wal
+data/archive/*.db-shm
+
+# Binary
+memory-mcp

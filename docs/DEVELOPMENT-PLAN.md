@@ -9,17 +9,17 @@ Three phases, each with clear deliverables and acceptance criteria. Phase 1 is t
 **Goal:** Fully functional Memory MCP binary that passes all tool tests via stdio.
 
 ### Task 1.1 — Project Scaffold
-- [ ] Initialize Go module (`go mod init github.com/wagnerlima/memory-cloud/memory-mcp`)
-- [ ] Add dependencies: `ncruces/go-sqlite3`, `modelcontextprotocol/go-sdk`, `google/uuid`
-- [ ] Create directory structure per MEMORY-MCP-SPEC.md §6
-- [ ] Create Dockerfile (multi-stage build)
-- [ ] Verify clean build: `go build -o memory-mcp .`
+- [x] Initialize Go module (`go mod init github.com/wagnerlima/memory-cloud/memory-mcp`)
+- [x] Add dependencies: `ncruces/go-sqlite3`, `modelcontextprotocol/go-sdk`, `google/uuid`
+- [x] Create directory structure per MEMORY-MCP-SPEC.md §6
+- [x] Create Dockerfile (multi-stage build)
+- [x] Verify clean build: `go build -o memory-mcp .`
 
 **Acceptance:** Binary compiles, runs, and exits cleanly.
 
 ### Task 1.2 — Storage Layer: Schema & Meta DB
-- [ ] Implement `internal/storage/schema.go` — SQL schema constants, migration logic
-- [ ] Implement `internal/storage/meta.go` — MetaStore struct wrapping `_meta.db`
+- [x] Implement `internal/storage/schema.go` — SQL schema constants, migration logic
+- [x] Implement `internal/storage/meta.go` — MetaStore struct wrapping `_meta.db`
   - `Open(dataDir)` → opens/creates `_meta.db`, runs migrations
   - `CreateProject(name, description)` → inserts project, creates DB file
   - `GetProject(name)` → lookup by name
@@ -31,7 +31,7 @@ Three phases, each with clear deliverables and acceptance criteria. Phase 1 is t
 **Acceptance:** Unit tests pass for all MetaStore operations. `_meta.db` file created correctly.
 
 ### Task 1.3 — Storage Layer: Project DB Operations
-- [ ] Implement `internal/storage/project.go` — ProjectStore struct wrapping a project DB
+- [x] Implement `internal/storage/project.go` — ProjectStore struct wrapping a project DB
   - `Open(dbPath)` → opens project DB, runs migrations, configures WAL/PRAGMAs
   - `CreateEntities(entities)` → batch insert with observations
   - `AddObservations(entityName, contents)` → add to existing entity
@@ -46,7 +46,7 @@ Three phases, each with clear deliverables and acceptance criteria. Phase 1 is t
 **Acceptance:** Unit tests for all CRUD operations. Soft delete verified. Cascade verified.
 
 ### Task 1.4 — Storage Layer: FTS5 Search
-- [ ] Implement `internal/storage/search.go`
+- [x] Implement `internal/storage/search.go`
   - `Search(query)` → FTS5 search across entities and observations
   - Merge results: entity matches + entities owning matched observations
   - Load full entity data (observations + relations) for results
@@ -55,7 +55,7 @@ Three phases, each with clear deliverables and acceptance criteria. Phase 1 is t
 **Acceptance:** Search returns correct results for various query patterns. Performance < 100ms for typical workloads.
 
 ### Task 1.5 — Session Management
-- [ ] Implement `internal/session/session.go`
+- [x] Implement `internal/session/session.go`
   - `Session` struct with `CurrentProjectID`, `CurrentProjectName`, `ProjectDB`
   - `SwitchProject(metaStore, name)` → close current, open new
   - `GetCurrent()` → return current project info
@@ -65,11 +65,11 @@ Three phases, each with clear deliverables and acceptance criteria. Phase 1 is t
 **Acceptance:** Session correctly switches between projects. Old connection properly closed.
 
 ### Task 1.6 — MCP Tool Handlers
-- [ ] Implement `internal/tools/projects.go` — handlers for project management tools
+- [x] Implement `internal/tools/projects.go` — handlers for project management tools
   - `handleListProjects`, `handleCreateProject`, `handleSwitchProject`
   - `handleGetCurrentProject`, `handleArchiveProject`, `handleDeleteProject`
   - `handleRestoreProject`
-- [ ] Implement `internal/tools/knowledge.go` — handlers for knowledge graph tools
+- [x] Implement `internal/tools/knowledge.go` — handlers for knowledge graph tools
   - `handleCreateEntities`, `handleAddObservations`, `handleCreateRelations`
   - `handleSearchNodes`, `handleOpenNodes`, `handleReadGraph`
   - `handleDeleteEntities`, `handleDeleteObservations`, `handleDeleteRelations`
@@ -78,13 +78,13 @@ Three phases, each with clear deliverables and acceptance criteria. Phase 1 is t
 **Acceptance:** All handlers correctly parse input, call storage layer, format output.
 
 ### Task 1.7 — MCP Server Wiring
-- [ ] Implement `internal/server/server.go` — server setup and tool registration
-- [ ] Implement `main.go` — entry point with CLI flags
+- [x] Implement `internal/server/server.go` — server setup and tool registration
+- [x] Implement `main.go` — entry point with CLI flags
   - `--transport stdio|http`
   - `--port 8081` (for HTTP mode)
   - `--data-dir ./data`
-- [ ] Register all tools with mcp-go SDK using Go struct schemas
-- [ ] Wire handlers to session + storage layer
+- [x] Register all tools with mcp-go SDK using Go struct schemas
+- [x] Wire handlers to session + storage layer
 
 **Acceptance:** Server starts in stdio mode, responds to `initialize`, lists all tools via `tools/list`.
 
