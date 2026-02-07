@@ -1,0 +1,24 @@
+# Environment & Secrets
+.env
+*.env.local
+
+# Data files (runtime)
+data/
+*.db
+
+# Go
+memory-mcp/memory-mcp
+memory-mcp/tmp/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Docker
+docker-compose.override.yml
