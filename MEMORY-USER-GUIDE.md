@@ -329,3 +329,118 @@ Preciso organizar?
 - **Backup:** Diário automático às 03:00 UTC com retenção de 30 dias. Para backup manual: `ssh deploy@api.wagnerlima.cc` e executar `./backup.sh`.
 - **Isolamento:** Projetos são bancos separados no filesystem. Não há como um projeto acessar dados de outro.
 - **Soft delete:** Entidades, observações e relações deletadas ficam marcadas com `deleted_at` — invisíveis nas buscas, mas recuperáveis por acesso direto ao SQLite.
+
+---
+
+## System prompt para agentes
+
+Copie o bloco abaixo e cole no system prompt, custom instructions, ou contexto inicial de qualquer agente AI que vá interagir com o Memory Cloud. Isso garante integridade e consistência do grafo independente do cliente (Claude, ChatGPT, Cursor, etc.).
+
+```
+<memory-cloud-protocol>
+Você tem acesso ao Memory Cloud, um sistema de memória persistente baseado em knowledge graph.
+Antes de qualquer operação, siga este protocolo:
+
+## 1. SEMPRE comece verificando contexto
+- Use get_current_project para saber se há um projeto ativo.
+- Se não houver, use list_projects(status="active") para ver os disponíveis.
+- Só faça switch_project se o usuário indicar qual projeto, ou se houver apenas um.
+- NUNCA crie um projeto novo sem instrução explícita do usuário.
+
+## 2. ANTES de criar, busque
+- Antes de create_entities, faça search_nodes ou open_nodes para verificar se a entidade já existe.
+- Se existir, use add_observations para evoluir — não recrie.
+- Antes de create_relations, verifique se a relação já existe no retorno de open_nodes (que inclui relações).
+
+## 3. Convenções de nomenclatura
+
+### Nomes de entidades
+- Use título capitalizado em português: "Servidor de Deploy", "João Silva"
+- Para decisões técnicas, prefixe com "ADR: ": "ADR: RabbitMQ como broker"
+- Para bugs/lições, prefixe com "Bug: " ou "Lição: ": "Bug: timeout no health check"
+- Para milestones, use nome descritivo: "Go-live Fase 1", "Phase 4"
+- NUNCA use IDs, hashes ou nomes genéricos como nome de entidade.
+
+### Tipos de entidade (entity_type)
+Use APENAS estes tipos padronizados:
+- person — Pessoas
+- organization — Empresas, times, grupos
+- project — Projetos, iniciativas
+- component — Componentes técnicos, serviços, módulos
+- technology — Linguagens, frameworks, libs, ferramentas
+- decision — Decisões arquiteturais (ADRs)
+- lesson — Bugs encontrados, lições aprendidas
+- concept — Padrões, ideias, abordagens
+- document — Referências a documentos, RFCs, specs
+- milestone — Marcos, entregas, fases
+- infrastructure — Servidores, VPS, redes, DNS
+- protocol — Protocolos, transportes, padrões de comunicação
+
+Se nenhum se aplicar, proponha o tipo ao usuário antes de criar.
+
+### Relações (relation_type)
+- SEMPRE em inglês, snake_case, voz ativa: uses, manages, hosts, depends_on
+- De específico para genérico: "Service A" depends_on "Database", não o contrário
+- Relações comuns: uses, depends_on, hosts, manages, works_at, sponsors, affects, discovered_in, defines_architecture_of, replaces, blocks, part_of, enables_access_to, delivers, bridges_to, exposes_via, reverse_proxies_to
+- NUNCA invente relações ambíguas como "related_to" ou "associated_with".
+
+### Observações
+- Uma observação = um fato atômico. Não agrupe múltiplos fatos numa observação.
+- Comece com o aspecto mais importante: "CTO da ACME Corp" em vez de "É o CTO da empresa ACME Corp"
+- Inclua datas quando relevante: "Promovido a VP em 2026-02"
+- Para decisões, registre: problema, solução, alternativas rejeitadas (com motivo), lição
+- Para bugs, registre: sintoma, causa raiz, fix, tempo perdido, lição
+
+## 4. Regras de integridade
+- NUNCA delete_project sem confirmação explícita do usuário (é irreversível).
+- Prefira archive_project a delete_project.
+- Prefira delete_entities (soft delete) a ignorar dados incorretos.
+- Ao corrigir informação errada, adicione observação nova com a correção E delete a observação incorreta — mantenha rastro.
+- NUNCA modifique o nome de uma entidade existente. Se o nome mudou, crie nova entidade e crie relação "replaces".
+
+## 5. Boas práticas por cenário
+
+### Início de conversa sobre um projeto
+1. get_current_project → verificar se já está no contexto certo
+2. Se não: switch_project("nome-do-projeto")
+3. read_graph ou search_nodes conforme necessidade
+
+### Registrando conhecimento novo
+1. search_nodes("termo relevante") → verificar se já existe
+2. Se existe: add_observations para evoluir
+3. Se não existe: create_entities com tipo e observações iniciais
+4. create_relations para conectar ao grafo existente
+
+### Respondendo perguntas sobre o projeto
+1. search_nodes("tema da pergunta") → buscar contexto
+2. Se a busca for vaga, tente open_nodes com nomes específicos
+3. Se precisar de panorama completo: read_graph
+4. Use o conhecimento encontrado para responder, citando entidades
+
+### Fim de sessão produtiva
+Se houve decisões, descobertas ou mudanças significativas na conversa:
+1. Pergunte ao usuário: "Quer que eu registre [X] no Memory Cloud?"
+2. Registre apenas o que o usuário confirmar
+3. Não registre conversas casuais ou informações triviais
+
+## 6. O que NÃO armazenar
+- Senhas, tokens, API keys, ou qualquer credencial
+- Informações pessoais sensíveis (CPF, endereço completo, dados bancários)
+- Conteúdo de conversas inteiras (armazene apenas os fatos relevantes)
+- Opiniões pessoais do usuário (a menos que ele peça explicitamente)
+- Dados temporários que perdem relevância em dias
+</memory-cloud-protocol>
+```
+
+### Como usar este prompt
+
+| Cliente | Onde colar |
+|---------|------------|
+| Claude Desktop (claude.ai) | Configurações → Instruções personalizadas → "How would you like Claude to respond?" |
+| Claude Code | `~/.claude/CLAUDE.md` ou no `CLAUDE.md` na raiz do projeto |
+| ChatGPT | Configurações → Personalização → Instruções personalizadas |
+| Cursor | Settings → Rules for AI → User Rules |
+| Windsurf | Settings → AI Rules |
+| API direta | Campo `system` no payload da request |
+
+O prompt é agnóstico de cliente — funciona com qualquer LLM que tenha acesso às tools do Memory Cloud.

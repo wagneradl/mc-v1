@@ -16,8 +16,30 @@ services:
       - caddy_config:/config
     depends_on:
       - mcp-proxy
+      - oauth-server
     networks:
       - mcp-net
+
+  # ── OAuth Authorization Server (Phase 4) ────────────
+  oauth-server:
+    build: ./oauth-server
+    container_name: mcp-oauth
+    restart: unless-stopped
+    environment:
+      - OAUTH_AUTHORIZE_PASSWORD=${OAUTH_AUTHORIZE_PASSWORD}
+      - MCP_BEARER_TOKEN=${MCP_BEARER_TOKEN}
+      - OAUTH_SERVER_BASE_URL=https://${DOMAIN}
+      - MCP_RESOURCE_URL=https://${DOMAIN}
+      - PORT=8090
+    expose:
+      - "8090"
+    networks:
+      - mcp-net
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8090/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
   # ── MCP Proxy (Aggregator + all MCP servers) ───────
   mcp-proxy:

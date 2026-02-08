@@ -20,5 +20,11 @@ Thumbs.db
 *.swp
 *.swo
 
+# TLS certificates (local & production)
+certs/
+
+# OAuth server binary
+oauth-server/oauth-server
+
 # Docker
 docker-compose.override.yml
