@@ -144,25 +144,27 @@ Three phases, each with clear deliverables and acceptance criteria. Phase 1 is t
 **Goal:** Production deployment on VPS, all clients configured and working.
 
 ### Task 3.1 — VPS Setup
-- [ ] Provision VPS (Ubuntu 24.04)
-- [ ] Install Docker + Docker Compose
-- [ ] Configure firewall (UFW: 80, 443, SSH)
+- [x] Provision VPS (Ubuntu 22.04, 2 vCPU, 8GB RAM, 75GB SSD — Hetzner)
+- [x] Install Docker 29.2.1 + Docker Compose v5.0.2
+- [x] Configure firewall (UFW: 80, 443, SSH)
 - [ ] Set up SSH key auth, disable root login
-- [ ] Install and configure fail2ban
-- [ ] Create `/opt/mcp-hub` directory structure
+- [x] Install and configure fail2ban
+- [x] Create `/opt/mcp-hub` directory structure
 
 ### Task 3.2 — DNS & TLS
-- [ ] Configure DNS A record for MCP subdomain
-- [ ] Verify DNS propagation
-- [ ] Deploy with `docker compose up -d`
-- [ ] Verify TLS certificate provisioning (Caddy logs)
+- [x] Configure DNS A record for MCP subdomain (Cloudflare proxied)
+- [x] Cloudflare Origin Certificate (15-year) configured in Caddy
+- [x] SSL mode: Full (strict) on Cloudflare
+- [x] Deploy with `docker compose up -d`
+- [x] Verify TLS certificate provisioning (Caddy logs confirmed)
 
 ### Task 3.3 — Deploy & Verify
-- [ ] Upload code and configs to VPS
-- [ ] Create `.env` with production secrets
-- [ ] `docker compose up -d`
-- [ ] Smoke test all endpoints with curl
-- [ ] Test each MCP server individually
+- [x] Upload code and configs to VPS via rsync
+- [x] Create `.env` with production secrets (DOMAIN=api.wagnerlima.cc)
+- [x] `docker compose up -d` — all 8 MCPs initialized
+- [x] Smoke test: 401 without token, Memory MCP initialize with token
+- [x] Test Brave Search + GitHub MCP end-to-end through production domain
+- [x] Test Memory MCP full CRUD workflow (create project, entities, search, delete)
 
 ### Task 3.4 — Client Configuration
 - [ ] Configure Claude Desktop (local mcp-proxy → VPS)

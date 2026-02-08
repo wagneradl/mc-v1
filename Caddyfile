@@ -1,4 +1,7 @@
 {$DOMAIN} {
+    # TLS: Cloudflare Origin Certificate (no auto-ACME)
+    tls /etc/caddy/certs/origin.pem /etc/caddy/certs/origin-key.pem
+
     # Bearer token authentication
     @authorized {
         header Authorization "Bearer {$MCP_BEARER_TOKEN}"
