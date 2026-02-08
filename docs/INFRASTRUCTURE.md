@@ -50,6 +50,10 @@ TODOIST_API_TOKEN=<todoist-api-token>
 
 # Domain
 DOMAIN=mcp.yourdomain.com
+
+# OAuth Authorization Server (Phase 4 — ChatGPT)
+OAUTH_AUTHORIZE_PASSWORD=<generate-with-openssl-rand-hex-16>
+# MCP_BEARER_TOKEN above is reused as OAuth access_token
 ```
 
 Generate bearer token:

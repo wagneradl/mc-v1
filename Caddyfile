@@ -2,36 +2,28 @@
     # TLS: Cloudflare Origin Certificate (no auto-ACME)
     tls /etc/caddy/certs/origin.pem /etc/caddy/certs/origin-key.pem
 
-    # 1. OAuth discovery + endpoints — NO auth (they ARE the auth mechanism)
-    handle /.well-known/oauth-protected-resource {
-        reverse_proxy oauth-server:8090
-    }
+    # Use route for explicit ordering (first match wins)
+    route {
+        # 1. OAuth discovery endpoints — NO auth required
+        reverse_proxy /.well-known/oauth-protected-resource oauth-server:8090
+        reverse_proxy /.well-known/oauth-authorization-server oauth-server:8090
 
-    handle /.well-known/oauth-authorization-server {
-        reverse_proxy oauth-server:8090
-    }
+        # 2. OAuth flow endpoints — NO auth required
+        reverse_proxy /oauth/* oauth-server:8090
 
-    handle /oauth/* {
-        reverse_proxy oauth-server:8090
-    }
-
-    # 2. MCP endpoints — Bearer auth required
-    @authorized {
-        header Authorization "Bearer {$MCP_BEARER_TOKEN}"
-    }
-    handle @authorized {
-        reverse_proxy mcp-proxy:8080 {
-            # SSE-friendly settings
+        # 3. MCP endpoints — Bearer auth required
+        @authorized {
+            header Authorization "Bearer {$MCP_BEARER_TOKEN}"
+        }
+        reverse_proxy @authorized mcp-proxy:8080 {
             flush_interval -1
             transport http {
                 read_timeout 0
                 write_timeout 0
             }
         }
-    }
 
-    # 3. Catch-all — 401
-    handle {
+        # 4. Catch-all — 401
         respond "Unauthorized" 401
     }
 

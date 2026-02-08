@@ -4,11 +4,12 @@
 
 Memory Cloud is a personal MCP Hub deployed on a VPS that aggregates multiple MCP servers behind a single authenticated endpoint. It exposes tools via Streamable HTTP (primary) and SSE (compatibility) for consumption by Claude Desktop, Claude Code, ChatGPT, Cursor, and other MCP-compatible clients.
 
-The system has three layers:
+The system has four layers:
 
 1. **Edge Layer** — Caddy reverse proxy handling TLS termination and Bearer token authentication
-2. **Proxy Layer** — mcp-proxy aggregating multiple MCP servers via named server routing
-3. **Service Layer** — Individual MCP servers (off-the-shelf + custom Memory MCP)
+2. **Auth Layer** — OAuth 2.1 Authorization Server enabling ChatGPT and other OAuth-only clients
+3. **Proxy Layer** — mcp-proxy aggregating multiple MCP servers via named server routing
+4. **Service Layer** — Individual MCP servers (off-the-shelf + custom Memory MCP)
 
 ## 2. Component Diagram
 
@@ -27,11 +28,20 @@ The system has three layers:
 │                                                                  │
 │  ┌────────────────────────────────────────────────────────────┐  │
 │  │  Caddy                                                     │  │
-│  │  - TLS auto-provisioning (Let's Encrypt)                   │  │
+│  │  - TLS (Cloudflare Origin Certificate)                     │  │
 │  │  - Bearer token validation                                 │  │
-│  │  - Reverse proxy to mcp-proxy:8080                         │  │
-│  └─────────────────────┬──────────────────────────────────────┘  │
-│                        ▼                                         │
+│  │  - Routes: .well-known/* + /oauth/* → oauth-server         │  │
+│  │  - Routes: authorized requests → mcp-proxy                 │  │
+│  └──────────┬─────────────────────────┬──────────────────────┘  │
+│             ▼                         ▼                         │
+│  ┌──────────────────────┐                                       │
+│  │  oauth-server (Go)    │                                       │
+│  │  - OAuth 2.1 (PKCE)   │                                       │
+│  │  - DCR, Authorize,    │                                       │
+│  │    Token endpoints    │                                       │
+│  │  - Returns MCP_BEARER │                                       │
+│  │    as access_token    │                                       │
+│  └──────────────────────┘                                       │
 │  ┌────────────────────────────────────────────────────────────┐  │
 │  │  mcp-proxy (sparfenyuk/mcp-proxy)                          │  │
 │  │  - Named server routing                                    │  │
@@ -59,6 +69,7 @@ The system has three layers:
 |-----------|-----------|-----------------|---------------|
 | Reverse Proxy + TLS | Caddy | Latest | Auto-TLS (Let's Encrypt), native Bearer token auth via header matcher, zero-config cert renewal |
 | MCP Proxy/Bridge | sparfenyuk/mcp-proxy | Latest | stdio→Streamable HTTP bridge, named server routing, already solves aggregation |
+| OAuth Server | Go | 1.25 | OAuth 2.1 Authorization Code + PKCE + DCR for ChatGPT integration, stdlib only (+ google/uuid) |
 | Memory MCP Server | Go | 1.22+ | Performance, single binary, matches SQLite driver choice |
 | Memory MCP SDK | modelcontextprotocol/go-sdk | Latest | Official MCP SDK, supports stdio + Streamable HTTP, auto-schema from Go structs |
 | SQLite Driver | ncruces/go-sqlite3 | Latest | Pure Go (no CGO), native WAL shared memory, FTS5 + JSON1 built-in |
@@ -121,6 +132,8 @@ mcp-proxy exposes both `/mcp` (Streamable HTTP) and `/sse` (legacy SSE) endpoint
 - **Token stored in**: `.env` on VPS, never committed to git
 - **Validated at**: Caddy layer (before reaching any MCP server)
 - **Client-side**: Token configured per-client (env var or config file)
+- **OAuth flow**: ChatGPT and other OAuth-only clients obtain the Bearer token via OAuth 2.1 (Authorization Code + PKCE + DCR). The `access_token` returned is the same `MCP_BEARER_TOKEN` — zero change to Caddy auth or mcp-proxy
+- **OAuth password**: `OAUTH_AUTHORIZE_PASSWORD` in `.env` protects the authorization endpoint (128-bit entropy)
 
 ### Network Security
 - Caddy exposes only ports 80/443

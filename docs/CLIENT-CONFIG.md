@@ -17,15 +17,17 @@ Memory Cloud exposes 8 MCP servers via HTTPS on `api.wagnerlima.cc`. Each server
 
 ### Authentication
 
-All endpoints require Bearer token:
+All MCP endpoints require Bearer token:
 ```
 Authorization: Bearer <MCP_BEARER_TOKEN>
 ```
 
+Clients that support custom headers (Claude Desktop, Claude Code, Cursor) send the Bearer token directly. Clients that don't (ChatGPT) obtain it automatically via OAuth 2.1.
+
 ### Transport
 
 - **Streamable HTTP (recommended):** `POST https://api.wagnerlima.cc/servers/<name>/mcp`
-- **SSE (legacy):** `GET https://api.wagnerlima.cc/servers/<name>/sse`
+- **SSE (legacy/ChatGPT):** `GET https://api.wagnerlima.cc/servers/<name>/sse`
 
 ## 2. Claude Desktop
 
@@ -119,7 +121,46 @@ Most modern MCP clients support HTTP or SSE transport:
 }
 ```
 
-## 5. Testing Connection
+## 5. ChatGPT
+
+ChatGPT MCP Apps cannot send custom headers. Instead, ChatGPT uses OAuth 2.1 (Authorization Code + PKCE + DCR) to obtain the Bearer token automatically.
+
+### How it works
+
+1. ChatGPT hits `/servers/<name>/sse` → gets 401
+2. ChatGPT discovers the IdP via `/.well-known/oauth-protected-resource`
+3. ChatGPT reads metadata from `/.well-known/oauth-authorization-server`
+4. ChatGPT registers via Dynamic Client Registration (`POST /oauth/register`)
+5. ChatGPT redirects you to the login page (`/oauth/authorize`)
+6. You enter the `OAUTH_AUTHORIZE_PASSWORD` from your `.env` file
+7. ChatGPT exchanges the auth code for a Bearer token (`POST /oauth/token`)
+8. All subsequent MCP requests use `Authorization: Bearer <token>`
+
+### Registering MCP Apps in ChatGPT
+
+For each MCP server, create an App in ChatGPT with:
+
+| MCP | Name | MCP Server URL | Auth |
+|-----|------|---------------|------|
+| Memory | Memory Cloud | `https://api.wagnerlima.cc/servers/memory/sse` | OAuth |
+| GitHub | GitHub Remote | `https://api.wagnerlima.cc/servers/github/sse` | OAuth |
+| Brave | Brave Search | `https://api.wagnerlima.cc/servers/brave/sse` | OAuth |
+| Todoist | Todoist | `https://api.wagnerlima.cc/servers/todoist/sse` | OAuth |
+| Git | Git Remote | `https://api.wagnerlima.cc/servers/git/sse` | OAuth |
+| Firecrawl | Firecrawl | `https://api.wagnerlima.cc/servers/firecrawl/sse` | OAuth |
+| Puppeteer | Puppeteer Remote | `https://api.wagnerlima.cc/servers/puppeteer/sse` | OAuth |
+| Thinking | Sequential Thinking | `https://api.wagnerlima.cc/servers/thinking/sse` | OAuth |
+
+No need to provide auth/token URLs manually — ChatGPT discovers everything via `.well-known`. Just select "OAuth" and click "Connect".
+
+### Notes
+
+- The login password is `OAUTH_AUTHORIZE_PASSWORD` from the VPS `.env` file
+- All 8 Apps share the same Bearer token after authentication
+- Token expires in 24h; ChatGPT auto-refreshes via refresh_token
+- Container restarts invalidate refresh tokens (ChatGPT re-authenticates automatically)
+
+## 6. Testing Connection
 
 ```bash
 # Test auth (should return 401)
@@ -133,7 +174,7 @@ curl -s -X POST https://api.wagnerlima.cc/servers/memory/mcp \
   -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-03-26","capabilities":{},"clientInfo":{"name":"test","version":"1.0"}}}'
 ```
 
-## 6. Troubleshooting
+## 7. Troubleshooting
 
 | Problem | Likely Cause | Fix |
 |---------|-------------|-----|
@@ -144,7 +185,7 @@ curl -s -X POST https://api.wagnerlima.cc/servers/memory/mcp \
 | Memory tools error "no active project" | No project selected | Call `switch_project` first |
 | SSE connection drops | Cloudflare buffering | Use Streamable HTTP instead of SSE |
 
-## 7. Operations
+## 8. Operations
 
 ### Update procedure
 

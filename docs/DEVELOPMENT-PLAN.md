@@ -181,15 +181,74 @@ Three phases, each with clear deliverables and acceptance criteria. Phase 1 is t
 
 ---
 
+## Phase 4 — OAuth 2.1 Gateway (ChatGPT Integration)
+
+**Goal:** Enable ChatGPT MCP Apps to connect via OAuth 2.1 (Authorization Code + PKCE + DCR).
+
+### Task 4.1 — OAuth Server: Metadata Endpoints
+- [x] Create `oauth-server/` Go project (stdlib + google/uuid)
+- [x] Implement `GET /.well-known/oauth-protected-resource`
+- [x] Implement `GET /.well-known/oauth-authorization-server` (RFC 8414)
+- [x] Implement `GET /health`
+- [x] Create multi-stage Dockerfile
+
+### Task 4.2 — OAuth Server: Dynamic Client Registration
+- [x] Implement `POST /oauth/register` (DCR)
+- [x] In-memory client store with sync.RWMutex
+
+### Task 4.3 — OAuth Server: Authorization Endpoint
+- [x] Implement `GET /oauth/authorize` — HTML login page
+- [x] Implement `POST /oauth/authorize` — password validation, auth code generation
+- [x] Auth codes: single-use, 5-minute expiry, periodic cleanup
+
+### Task 4.4 — OAuth Server: Token Endpoint
+- [x] Implement `POST /oauth/token` — authorization_code grant with PKCE (S256)
+- [x] Implement `POST /oauth/token` — refresh_token grant with rotation
+- [x] access_token = MCP_BEARER_TOKEN (zero change to existing auth)
+
+### Task 4.5 — Infrastructure
+- [x] Add oauth-server service to docker-compose.yml with healthcheck
+- [x] Update Caddyfile: `route` directive for explicit ordering
+- [x] Routes: `.well-known/*` and `/oauth/*` → oauth-server (no auth)
+- [x] Routes: authorized requests → mcp-proxy (Bearer auth)
+- [x] Update .env.example with OAUTH_AUTHORIZE_PASSWORD
+
+### Task 4.6 — Local Testing
+- [x] Discovery endpoints return correct metadata
+- [x] DCR returns client_id
+- [x] Authorization flow: login page, wrong password error, correct password redirect
+- [x] Token exchange: PKCE validation, access_token = MCP_BEARER_TOKEN
+- [x] One-time code use enforced
+- [x] Refresh token rotation
+- [x] MCP access with Bearer: 200, without: 401
+
+### Task 4.7 — VPS Deploy
+- [x] rsync code to VPS, generate production OAUTH_AUTHORIZE_PASSWORD
+- [x] Build and deploy (update.sh --rebuild)
+- [x] Fix Caddyfile routing (handle → route directive)
+- [x] All production endpoints verified
+
+### Task 4.8 — ChatGPT MCP Apps
+- [x] Configuration documented for all 8 MCPs (SSE endpoints + OAuth)
+
+### Task 4.9 — Documentation
+- [x] CLIENT-CONFIG.md: ChatGPT section with OAuth flow
+- [x] ARCHITECTURE.md: oauth-server component + auth layer
+- [x] INFRASTRUCTURE.md: OAUTH_AUTHORIZE_PASSWORD env var
+- [x] DEVELOPMENT-PLAN.md: Phase 4 complete
+
+---
+
 ## Estimated Effort
 
-| Phase | Estimated Sessions | Complexity |
-|-------|-------------------|------------|
-| Phase 1 (Memory MCP) | 2-3 sessions | High (custom Go development) |
-| Phase 2 (Infra + Proxy) | 1 session | Medium (config and wiring) |
-| Phase 3 (Deploy) | 1 session | Low (standard ops) |
+| Phase | Estimated Sessions | Complexity | Status |
+|-------|-------------------|------------|--------|
+| Phase 1 (Memory MCP) | 2-3 sessions | High (custom Go development) | ✅ Complete |
+| Phase 2 (Infra + Proxy) | 1 session | Medium (config and wiring) | ✅ Complete |
+| Phase 3 (Deploy) | 1 session | Low (standard ops) | ✅ Complete |
+| Phase 4 (OAuth Gateway) | 1 session | Medium (Go + infra) | ✅ Complete |
 
-**Total: ~4-5 development sessions**
+**Total: ~5-6 development sessions**
 
 ## Development Session Guidelines
 
