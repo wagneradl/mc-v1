@@ -24,11 +24,14 @@ Memory Cloud is a self-hosted MCP (Model Context Protocol) Hub running on a VPS,
 - **mcp-proxy (sparfenyuk)**: https://github.com/sparfenyuk/mcp-proxy
 - **Caddy**: https://caddyserver.com/docs
 
+| [ADDING-NEW-MCP.md](./ADDING-NEW-MCP.md) | Step-by-step guide for adding new MCP servers to the hub |
+
 ## Project Status
 
 - [x] Research phase complete (6/6 research queries)
 - [x] Architecture defined
 - [x] Documentation consolidated
-- [ ] Phase 1: Memory MCP development
-- [ ] Phase 2: Infrastructure + Proxy setup
-- [ ] Phase 3: VPS deployment
+- [x] Phase 1: Memory MCP server (Go + SQLite + FTS5)
+- [x] Phase 2: Docker infrastructure + mcp-proxy aggregation
+- [x] Phase 3: VPS deployment, Caddy, TLS, Claude Desktop + Code
+- [x] Phase 4: OAuth 2.1 server, ChatGPT integration, agent system prompt
