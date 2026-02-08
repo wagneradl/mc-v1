@@ -13,8 +13,8 @@ FROM ghcr.io/sparfenyuk/mcp-proxy:latest
 
 USER root
 
-# Install Node.js + npm (for npx-based MCP servers) and uv (for uvx-based servers)
-RUN apk add --no-cache nodejs npm && \
+# Install Node.js + npm (for npx-based MCP servers), uv (for uvx-based), and git (for mcp-server-git)
+RUN apk add --no-cache nodejs npm git && \
     pip install --no-cache-dir uv
 
 # Copy memory-mcp binary from builder
@@ -24,11 +24,11 @@ RUN chmod +x /usr/local/bin/memory-mcp
 # Copy server config
 COPY mcp-servers.json /etc/mcp-proxy/servers.json
 
-# Create data directory for memory-mcp and npm/uv cache dirs for non-root user
+# Create data directory for memory-mcp and cache dirs for non-root user
 RUN mkdir -p /data/memory/projects /data/memory/archive && \
     chown -R 1000:1000 /data/memory && \
-    mkdir -p /.npm /.cache/uv && \
-    chown -R 1000:1000 /.npm /.cache
+    mkdir -p /.npm /.cache/uv /.local/share/uv && \
+    chown -R 1000:1000 /.npm /.cache /.local
 
 USER 1000
 

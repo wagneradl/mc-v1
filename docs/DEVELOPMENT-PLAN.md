@@ -127,10 +127,10 @@ Three phases, each with clear deliverables and acceptance criteria. Phase 1 is t
 - [x] Test auth: 401 without token, 200 with token
 
 ### Task 2.3 — Integration Testing
-- [ ] Test each MCP server through the proxy
+- [x] Test each MCP server through the proxy (all 8 initialize, Brave + GitHub verified end-to-end)
 - [x] Test Memory MCP tools through the full stack (Caddy → proxy → Memory)
 - [x] Test SSE endpoint for streaming
-- [ ] Test with MCP Inspector through HTTPS
+- [ ] Test with MCP Inspector through HTTPS (deferred — not blocking)
 
 ### Task 2.4 — Environment & Secrets
 - [x] Create `.env.example` with all required variables (no real values)
