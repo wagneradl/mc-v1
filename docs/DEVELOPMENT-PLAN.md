@@ -147,7 +147,7 @@ Three phases, each with clear deliverables and acceptance criteria. Phase 1 is t
 - [x] Provision VPS (Ubuntu 22.04, 2 vCPU, 8GB RAM, 75GB SSD — Hetzner)
 - [x] Install Docker 29.2.1 + Docker Compose v5.0.2
 - [x] Configure firewall (UFW: 80, 443, SSH)
-- [ ] Set up SSH key auth, disable root login
+- [x] Set up SSH key auth, disable root login (`deploy` user, root blocked)
 - [x] Install and configure fail2ban
 - [x] Create `/opt/mcp-hub` directory structure
 
@@ -167,16 +167,17 @@ Three phases, each with clear deliverables and acceptance criteria. Phase 1 is t
 - [x] Test Memory MCP full CRUD workflow (create project, entities, search, delete)
 
 ### Task 3.4 — Client Configuration
-- [ ] Configure Claude Desktop (local mcp-proxy → VPS)
-- [ ] Configure Claude Code (direct HTTPS)
-- [ ] Test Memory MCP workflow end-to-end from each client
-- [ ] Document any client-specific quirks discovered
+- [x] Configure Claude Desktop (8 remote via `uvx mcp-proxy` + 3 local: filesystem, desktop-commander, azure-cli)
+- [x] Configure Claude Code (8 remote via `claude mcp add --transport http`)
+- [x] Test Memory MCP workflow end-to-end from each client
+- [x] Document client-specific quirks: Claude Desktop needs `uvx mcp-proxy` bridge for stdio→streamablehttp
 
 ### Task 3.5 — Operations Setup
-- [ ] Set up backup script for memory data
-- [ ] Schedule automated backups (cron)
-- [ ] Document update procedure (`docker compose pull && up -d`)
-- [ ] Test restore from backup
+- [x] Set up backup script (`/opt/mcp-hub/backup.sh` — tar.gz of SQLite volume)
+- [x] Schedule automated backups (cron daily at 03:00, keep 30 days)
+- [x] Document update procedure (`/opt/mcp-hub/update.sh` — pull/rebuild + restart)
+- [x] SSH hardened: `deploy` user with docker group, root login disabled
+- [ ] Test restore from backup (manual procedure documented)
 
 ---
 
