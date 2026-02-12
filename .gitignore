@@ -26,5 +26,8 @@ certs/
 # OAuth server binary
 oauth-server/oauth-server
 
+# Prompt files (session artifacts, not documentation)
+PROMPT-*.md
+
 # Docker
 docker-compose.override.yml

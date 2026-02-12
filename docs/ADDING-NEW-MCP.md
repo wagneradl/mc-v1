@@ -6,11 +6,12 @@ Guide for adding new MCP servers to the Memory Cloud hub infrastructure.
 
 ## Overview
 
-The hub uses `mcp-proxy` with `--named-server` flags to aggregate MCPs. Adding a new one requires **zero changes** to Caddy, OAuth, or TLS — the proxy routes automatically by server name.
+The hub uses `mcp-proxy` with a `mcp-servers.json` config file to aggregate MCPs. Adding a new one requires **zero changes** to Caddy, OAuth, or TLS — the proxy routes automatically by server name.
 
 After adding, the new MCP is accessible at:
 ```
-https://api.wagnerlima.cc/servers/{name}/sse
+https://api.wagnerlima.cc/servers/{name}/sse     # SSE transport
+https://api.wagnerlima.cc/servers/{name}/mcp     # Streamable HTTP transport
 ```
 
 ---
@@ -19,15 +20,19 @@ https://api.wagnerlima.cc/servers/{name}/sse
 
 ### 1. Local — Configure the MCP
 
-**`docker-compose.yml`** — Add a `--named-server` entry to the mcp-proxy command:
+**`mcp-servers.json`** — Add a new entry:
 
-```yaml
-command: >
-  --port 8080
-  --named-server memory "./memory-mcp --transport stdio --data-dir /data/memory"
-  --named-server github "npx -y @modelcontextprotocol/server-github"
-  ...
-  --named-server novo-mcp "npx -y @pacote/novo-mcp"
+```json
+{
+  "mcpServers": {
+    "...existing servers...",
+    "novo-mcp": {
+      "command": "npx",
+      "args": ["-y", "@pacote/novo-mcp"],
+      "transportType": "stdio"
+    }
+  }
+}
 ```
 
 **`.env`** — If the MCP requires an API key:
@@ -71,15 +76,20 @@ docker compose logs mcp-proxy | grep novo-mcp
 ### 3. Deploy — VPS
 
 ```bash
-# SSH into VPS
-ssh deploy@46.225.69.233
+# Push to GitHub
+git add mcp-servers.json docker-compose.yml .env.example
+git commit -m "feat: add novo-mcp to hub"
+git push origin main
+
+# Sync to VPS
+rsync -avz --exclude='.git' --exclude='.env' --exclude='data/' --exclude='certs/' \
+  /Users/wagner/Projetos/memory-cloud/ deploy@46.225.69.233:/opt/mcp-hub/
 
 # Add API key to production .env
-cd /opt/mcp-hub
-nano .env  # Add NOVO_MCP_API_KEY=<production-key>
+ssh deploy@46.225.69.233 "echo 'NOVO_MCP_API_KEY=<production-key>' >> /opt/mcp-hub/.env"
 
-# Pull latest code and rebuild
-./update.sh --rebuild
+# Rebuild
+ssh deploy@46.225.69.233 "cd /opt/mcp-hub && ./update.sh --rebuild"
 
 # Test in production
 curl -H "Authorization: Bearer $MCP_BEARER_TOKEN" \
@@ -98,11 +108,9 @@ curl -H "Authorization: Bearer $MCP_BEARER_TOKEN" \
       "args": [
         "mcp-proxy",
         "--transport", "streamablehttp",
+        "-H", "Authorization: Bearer <MCP_BEARER_TOKEN>",
         "https://api.wagnerlima.cc/servers/novo-mcp/mcp"
-      ],
-      "env": {
-        "AUTHORIZATION": "Bearer <MCP_BEARER_TOKEN>"
-      }
+      ]
     }
   }
 }
@@ -131,11 +139,12 @@ No need to configure OAuth URLs — ChatGPT discovers everything via `.well-know
 
 1. **`docs/CLIENT-CONFIG.md`** — Add the new MCP to the client configuration tables
 2. **`docs/INFRASTRUCTURE.md`** — Add new env var to the environment variables section
-3. **Commit and push:**
+3. **`README.md`** — Add to the server table
+4. **Commit and push:**
 
 ```bash
 git add -A
-git commit -m "feat: add novo-mcp to hub"
+git commit -m "docs: add novo-mcp configuration"
 git push origin main
 ```
 
@@ -162,23 +171,25 @@ create_relations([{
 
 | Component | Change needed? | Why |
 |-----------|---------------|-----|
-| Caddyfile | ❌ No | Bearer auth applies to all `/servers/*` paths already |
-| OAuth Server | ❌ No | OAuth protects the whole hub, not individual MCPs |
-| TLS/DNS | ❌ No | Same domain, same certificate |
-| mcp-proxy image | ❌ No | Just add a `--named-server` flag |
+| Caddyfile | No | Bearer auth applies to all `/servers/*` paths already |
+| OAuth Server | No | OAuth protects the whole hub, not individual MCPs |
+| TLS/DNS | No | Same domain, same certificate |
+| Dockerfile.mcp-proxy | No | `--pass-environment` forwards env vars automatically |
 
 ---
 
 ## Checklist
 
-- [ ] `docker-compose.yml` — `--named-server` added
+- [ ] `mcp-servers.json` — New server entry added
+- [ ] `docker-compose.yml` — API key env var added (if needed)
 - [ ] `.env` / `.env.example` — API key added (if needed)
 - [ ] Local test passing
+- [ ] Pushed to GitHub
+- [ ] VPS synced and rebuilt
 - [ ] VPS `.env` updated with production key
-- [ ] VPS deployed and tested
+- [ ] Production endpoint tested
 - [ ] Claude Desktop configured
 - [ ] Claude Code configured
 - [ ] ChatGPT App created
-- [ ] `docs/CLIENT-CONFIG.md` updated
-- [ ] `docs/INFRASTRUCTURE.md` updated
+- [ ] Documentation updated (CLIENT-CONFIG, INFRASTRUCTURE, README)
 - [ ] Committed and pushed

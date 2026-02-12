@@ -87,11 +87,8 @@ cd mc-v1
 cp .env.example .env
 # Edit .env with your API keys and tokens
 
-# Build Memory MCP binary
-cd memory-mcp && docker build -t memory-mcp:local . && cd ..
-
-# Start everything
-docker compose up -d
+# Build and start (multi-stage Dockerfile builds Memory MCP automatically)
+docker compose up -d --build
 
 # Verify
 curl -H "Authorization: Bearer $MCP_BEARER_TOKEN" \
