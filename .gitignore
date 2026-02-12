@@ -29,5 +29,9 @@ oauth-server/oauth-server
 # Prompt files (session artifacts, not documentation)
 PROMPT-*.md
 
+# VPS runtime (not in local dev)
+backups/
+mcp-servers.local.json
+
 # Docker
 docker-compose.override.yml
