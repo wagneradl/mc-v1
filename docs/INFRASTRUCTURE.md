@@ -46,7 +46,7 @@ MCP_BEARER_TOKEN=<generate-strong-random-token>
 GITHUB_TOKEN=<github-personal-access-token>
 FIRECRAWL_API_KEY=<firecrawl-api-key>
 BRAVE_API_KEY=<brave-search-api-key>
-TODOIST_API_TOKEN=<todoist-api-token>
+TODOIST_API_KEY=<todoist-api-key>
 
 # Domain
 DOMAIN=mcp.yourdomain.com
@@ -93,17 +93,17 @@ services:
       --port 8080
       --named-server memory "./memory-mcp --transport stdio --data-dir /data/memory"
       --named-server github "npx -y @modelcontextprotocol/server-github"
-      --named-server brave "npx -y @anthropic/mcp-brave-search"
-      --named-server todoist "npx -y todoist-mcp-server"
+      --named-server brave "npx -y @brave/brave-search-mcp-server"
+      --named-server todoist "npx -y @doist/todoist-ai"
       --named-server git "uvx mcp-server-git"
       --named-server firecrawl "npx -y firecrawl-mcp"
-      --named-server puppeteer "npx -y @anthropic/mcp-puppeteer"
-      --named-server thinking "npx -y @anthropic/mcp-sequential-thinking"
+      --named-server puppeteer "npx -y @modelcontextprotocol/server-puppeteer"
+      --named-server thinking "npx -y @modelcontextprotocol/server-sequential-thinking"
     environment:
       GITHUB_TOKEN: ${GITHUB_TOKEN}
       FIRECRAWL_API_KEY: ${FIRECRAWL_API_KEY}
       BRAVE_API_KEY: ${BRAVE_API_KEY}
-      TODOIST_API_TOKEN: ${TODOIST_API_TOKEN}
+      TODOIST_API_KEY: ${TODOIST_API_KEY}
     volumes:
       - memory_data:/data/memory
       - ./memory-mcp/memory-mcp:/usr/local/bin/memory-mcp:ro

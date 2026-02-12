@@ -17,7 +17,7 @@
     },
     "todoist": {
       "command": "npx",
-      "args": ["-y", "todoist-mcp-server"],
+      "args": ["-y", "@doist/todoist-ai"],
       "transportType": "stdio"
     },
     "git": {

@@ -16,12 +16,12 @@ Memory Cloud gives AI assistants persistent, cross-platform memory. A conversati
 |--------|---------|---------|
 | **Memory** | Custom (Go) | Knowledge graph with entities, relations, observations, project isolation |
 | **GitHub** | @modelcontextprotocol/server-github | Repository management, issues, PRs |
-| **Brave Search** | @anthropic/mcp-brave-search | Web search |
-| **Todoist** | todoist-mcp-server | Task management |
+| **Brave Search** | @brave/brave-search-mcp-server | Web search |
+| **Todoist** | @doist/todoist-ai | Task management |
 | **Git** | mcp-server-git | Local git operations |
 | **Firecrawl** | firecrawl-mcp | Web scraping and crawling |
-| **Puppeteer** | @anthropic/mcp-puppeteer | Browser automation |
-| **Sequential Thinking** | @anthropic/mcp-sequential-thinking | Structured reasoning |
+| **Puppeteer** | @modelcontextprotocol/server-puppeteer | Browser automation |
+| **Sequential Thinking** | @modelcontextprotocol/server-sequential-thinking | Structured reasoning |
 
 ---
 
