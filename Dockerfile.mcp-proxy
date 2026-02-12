@@ -32,9 +32,13 @@ RUN mkdir -p /data/memory/projects /data/memory/archive && \
     chown -R 1000:1000 /.npm /.cache /.local /tmp/.chromium
 
 # Puppeteer: use system Chromium in headless container mode
+# Replace crash handler with no-op to avoid "database is required" error in Alpine
+RUN mv /usr/lib/chromium/chrome_crashpad_handler /usr/lib/chromium/chrome_crashpad_handler.bak && \
+    printf '#!/bin/sh\nexit 0\n' > /usr/lib/chromium/chrome_crashpad_handler && \
+    chmod +x /usr/lib/chromium/chrome_crashpad_handler
+
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser \
-    CHROMIUM_FLAGS="--no-sandbox --disable-setuid-sandbox --disable-dev-shm-usage --disable-crash-reporter --disable-gpu"
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
 USER 1000
 
