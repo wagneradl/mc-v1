@@ -4,7 +4,7 @@
 
 ### Minimum Specs
 - **CPU:** 2 vCPUs
-- **RAM:** 4GB (8GB preferred for Puppeteer/Firecrawl)
+- **RAM:** 4GB (8GB preferred for Firecrawl)
 - **Disk:** 40GB SSD
 - **OS:** Ubuntu 22.04+ LTS
 - **Network:** Public IPv4, ports 80/443/SSH
@@ -169,7 +169,6 @@ networks:
     "todoist":   { "command": "npx", "args": ["-y", "@doist/todoist-ai"], "transportType": "stdio" },
     "git":       { "command": "uvx", "args": ["mcp-server-git"], "transportType": "stdio" },
     "firecrawl": { "command": "npx", "args": ["-y", "firecrawl-mcp"], "transportType": "stdio" },
-    "puppeteer": { "command": "npx", "args": ["-y", "@modelcontextprotocol/server-puppeteer"], "transportType": "stdio" },
     "thinking":  { "command": "npx", "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"], "transportType": "stdio" }
   }
 }

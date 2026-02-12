@@ -30,11 +30,6 @@
       "args": ["-y", "firecrawl-mcp"],
       "transportType": "stdio"
     },
-    "puppeteer": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-puppeteer"],
-      "transportType": "stdio"
-    },
     "thinking": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],

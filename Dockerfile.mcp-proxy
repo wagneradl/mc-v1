@@ -13,9 +13,8 @@ FROM ghcr.io/sparfenyuk/mcp-proxy:latest
 
 USER root
 
-# Install Node.js + npm (for npx-based MCP servers), uv (for uvx-based),
-# git (for mcp-server-git), and Chromium (for Puppeteer MCP)
-RUN apk add --no-cache nodejs npm git chromium nss freetype harfbuzz ca-certificates ttf-freefont && \
+# Install Node.js + npm (for npx-based MCP servers), uv (for uvx-based), and git (for mcp-server-git)
+RUN apk add --no-cache nodejs npm git && \
     pip install --no-cache-dir uv
 
 # Copy memory-mcp binary from builder
@@ -28,17 +27,8 @@ COPY mcp-servers.json /etc/mcp-proxy/servers.json
 # Create data directory for memory-mcp and cache dirs for non-root user
 RUN mkdir -p /data/memory/projects /data/memory/archive && \
     chown -R 1000:1000 /data/memory && \
-    mkdir -p /.npm /.cache/uv /.local/share/uv /tmp/.chromium && \
-    chown -R 1000:1000 /.npm /.cache /.local /tmp/.chromium
-
-# Puppeteer: use system Chromium in headless container mode
-# Replace crash handler with no-op to avoid "database is required" error in Alpine
-RUN mv /usr/lib/chromium/chrome_crashpad_handler /usr/lib/chromium/chrome_crashpad_handler.bak && \
-    printf '#!/bin/sh\nexit 0\n' > /usr/lib/chromium/chrome_crashpad_handler && \
-    chmod +x /usr/lib/chromium/chrome_crashpad_handler
-
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+    mkdir -p /.npm /.cache/uv /.local/share/uv && \
+    chown -R 1000:1000 /.npm /.cache /.local
 
 USER 1000
 

@@ -74,7 +74,7 @@ The system has four layers:
 | Memory MCP SDK | modelcontextprotocol/go-sdk | Latest | Official MCP SDK, supports stdio + Streamable HTTP, auto-schema from Go structs |
 | SQLite Driver | ncruces/go-sqlite3 | Latest | Pure Go (no CGO), native WAL shared memory, FTS5 + JSON1 built-in |
 | Containerization | Docker Compose | v2 | Declarative orchestration, volume management, service dependencies |
-| Off-the-shelf MCPs | npm/uvx packages | Various | Standard MCP servers for Firecrawl, Git, GitHub, Todoist, Brave Search, Puppeteer, Sequential Thinking |
+| Off-the-shelf MCPs | npm/uvx packages | Various | Standard MCP servers for Firecrawl, Git, GitHub, Todoist, Brave Search, Sequential Thinking |
 
 ## 4. Transport Strategy
 

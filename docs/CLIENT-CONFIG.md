@@ -12,7 +12,6 @@ Memory Cloud exposes 8 MCP servers via HTTPS on `api.wagnerlima.cc`. Each server
 | todoist | `/servers/todoist/mcp` | 33 (task management) |
 | git | `/servers/git/mcp` | 12 (git operations) |
 | firecrawl | `/servers/firecrawl/mcp` | 8 (web scraping) |
-| puppeteer | `/servers/puppeteer/mcp` | browser automation |
 | thinking | `/servers/thinking/mcp` | 1 (sequential thinking) |
 
 ### Authentication
@@ -93,7 +92,6 @@ claude mcp add brave-search "$BASE/brave/mcp" --transport http --scope user --he
 claude mcp add todoist-remote "$BASE/todoist/mcp" --transport http --scope user --header "Authorization: $TOKEN"
 claude mcp add git-remote "$BASE/git/mcp" --transport http --scope user --header "Authorization: $TOKEN"
 claude mcp add firecrawl-remote "$BASE/firecrawl/mcp" --transport http --scope user --header "Authorization: $TOKEN"
-claude mcp add puppeteer-remote "$BASE/puppeteer/mcp" --transport http --scope user --header "Authorization: $TOKEN"
 claude mcp add thinking-remote "$BASE/thinking/mcp" --transport http --scope user --header "Authorization: $TOKEN"
 ```
 
@@ -148,7 +146,6 @@ For each MCP server, create an App in ChatGPT with:
 | Todoist | Todoist | `https://api.wagnerlima.cc/servers/todoist/sse` | OAuth |
 | Git | Git Remote | `https://api.wagnerlima.cc/servers/git/sse` | OAuth |
 | Firecrawl | Firecrawl | `https://api.wagnerlima.cc/servers/firecrawl/sse` | OAuth |
-| Puppeteer | Puppeteer Remote | `https://api.wagnerlima.cc/servers/puppeteer/sse` | OAuth |
 | Thinking | Sequential Thinking | `https://api.wagnerlima.cc/servers/thinking/sse` | OAuth |
 
 No need to provide auth/token URLs manually — ChatGPT discovers everything via `.well-known`. Just select "OAuth" and click "Connect".
