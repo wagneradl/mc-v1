@@ -1,9 +1,0 @@
-{
-  "mcpServers": {
-    "memory": {
-      "command": "/usr/local/bin/memory-mcp",
-      "args": ["--transport", "stdio", "--data-dir", "/data/memory"],
-      "transportType": "stdio"
-    }
-  }
-}
