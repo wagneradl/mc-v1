@@ -1,5 +1,5 @@
 #!/bin/bash
-# Memory Cloud — Update Script
+# Memory Cloud — Update Script v1.1
 # Usage: ./update.sh [--rebuild]
 #   No args:   pull latest base images and restart
 #   --rebuild: also rebuild mcp-proxy image (after code changes)
