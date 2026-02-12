@@ -13,8 +13,9 @@ FROM ghcr.io/sparfenyuk/mcp-proxy:latest
 
 USER root
 
-# Install Node.js + npm (for npx-based MCP servers), uv (for uvx-based), and git (for mcp-server-git)
-RUN apk add --no-cache nodejs npm git && \
+# Install Node.js + npm (for npx-based MCP servers), uv (for uvx-based),
+# git (for mcp-server-git), and Chromium (for Puppeteer MCP)
+RUN apk add --no-cache nodejs npm git chromium nss freetype harfbuzz ca-certificates ttf-freefont && \
     pip install --no-cache-dir uv
 
 # Copy memory-mcp binary from builder
@@ -29,6 +30,10 @@ RUN mkdir -p /data/memory/projects /data/memory/archive && \
     chown -R 1000:1000 /data/memory && \
     mkdir -p /.npm /.cache/uv /.local/share/uv && \
     chown -R 1000:1000 /.npm /.cache /.local
+
+# Puppeteer: use system Chromium instead of downloading
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
 USER 1000
 
