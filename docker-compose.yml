@@ -58,6 +58,9 @@ services:
       TODOIST_API_KEY: ${TODOIST_API_KEY}
     volumes:
       - memory_data:/data/memory
+    # Chromium in Alpine requires relaxed seccomp for Puppeteer MCP
+    security_opt:
+      - seccomp:unconfined
     networks:
       - mcp-net
     deploy:
