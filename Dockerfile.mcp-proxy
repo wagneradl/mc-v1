@@ -28,12 +28,13 @@ COPY mcp-servers.json /etc/mcp-proxy/servers.json
 # Create data directory for memory-mcp and cache dirs for non-root user
 RUN mkdir -p /data/memory/projects /data/memory/archive && \
     chown -R 1000:1000 /data/memory && \
-    mkdir -p /.npm /.cache/uv /.local/share/uv && \
-    chown -R 1000:1000 /.npm /.cache /.local
+    mkdir -p /.npm /.cache/uv /.local/share/uv /tmp/.chromium && \
+    chown -R 1000:1000 /.npm /.cache /.local /tmp/.chromium
 
-# Puppeteer: use system Chromium instead of downloading
+# Puppeteer: use system Chromium in headless container mode
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser \
+    CHROMIUM_FLAGS="--no-sandbox --disable-setuid-sandbox --disable-dev-shm-usage --disable-crash-reporter --disable-gpu"
 
 USER 1000
 
